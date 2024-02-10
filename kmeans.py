@@ -58,17 +58,10 @@ class Kmeans:
         labels = {}
         inertia = 0
         for i in range(self.n_clusters):            
-        #    labels[i] = []
             labels[i] = list(np.where(min_distances == i)[0])
             if (len(labels[i])> 0):
                 inertia += np.sum(np.power(distances[i][labels[i]], 2))
 
-        #for i in range(np.shape(distances)[1]):
-        #    #d = [distance[i] for distance in distances]
-        #    
-        #    #labels[np.argmin(d)].append(i)
-        #    labels[np.argmin(distances[:,i])].append(i)
-        
         return labels, inertia
 
     def __is_valid_first_centroid(self, labels):
@@ -98,8 +91,8 @@ class Kmeans:
         for i in range(self.max_iter):
             labels, inertia = self.__kmeans_distribution(X, centroids)
 
-            #Se for a primeira iteraçao verifica se o centroid é valido,
-            #caso nao seja recalcula
+            #If it is the first iteration, check if the centroid is valid,
+            #if it is not recalculated
             if (i == 0):
                 centroids, labels, inertia = self.__kmeans_check(X, centroids, labels, inertia)
 
@@ -110,14 +103,9 @@ class Kmeans:
                     avg = np.average(np.take(X, labels[j], axis=0), axis = 0)
                     centroids[j] = avg
 
-            #limit_stop = np.ones(self.n_clusters, dtype=int)
-            #if self.__is_valid_centroid(labels):
             try:
                 distances = self.__kmeans_calculate_distances(centroids_anterior, centroids)
-                #for j in range(self.n_clusters):
-                #    d = distances[j][j]
-                #    if (d > self.tol):
-                #        limit_stop[j] = 0
+                
                 limit_stop = (distances[np.where(np.identity(self.n_clusters) == 1)] <= self.tol)
             except linalg.LinAlgError:
                 limit_stop = (np.ones(self.n_clusters, dtype=int) == 1)
@@ -139,17 +127,8 @@ class Kmeans:
 
         centroids = result[0]
         labels = result[1]
-        #inertia = 0
-        #for i in labels:
-        #    try:
-        #        centroid = [centroids[i]]
-        #        distances = self.__kmeans_calculate_distances(centroid, np.take(X, labels[i], axis=0))
-        #        inertia += np.sum(np.power(distances, 2))
-        #
-        #    except linalg.LinAlgError:
-        #        inertia += 0    
+        
         self.cluster_centers_ = centroids
-        #self.inertia_ = inertia
         self.inertia_ = result[2]
 
         self.labels_ = np.full(np.shape(X)[0], -1, dtype=np.int32)
@@ -160,11 +139,6 @@ class Kmeans:
 
 def predict(self, X):    
     distances = self.__kmeans_calculate_distances(self.cluster_centers_, X)
-    #labels = []
-    #for i in range(np.shape(distances)[1]):
-    #    d = [distance[i] for distance in distances]
-    #    
-    #    labels.append(np.argmin(d))
     labels = np.argmin(distances, axis=0)
 
     return labels
